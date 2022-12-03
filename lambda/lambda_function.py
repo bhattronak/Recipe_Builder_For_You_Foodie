@@ -7,7 +7,6 @@
 import logging
 import ask_sdk_core.utils as ask_utils
 
-from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
@@ -15,8 +14,11 @@ from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 
 from ask_sdk_model import Response
 
-import boto3
 import os
+import boto3
+
+from ask_sdk_core.skill_builder import CustomSkillBuilder
+from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 
 
 logger = logging.getLogger(__name__)
@@ -28,6 +30,7 @@ ddb_table_name = os.environ.get('DYNAMODB_PERSISTENCE_TABLE_NAME')
 ddb_resource = boto3.resource('dynamodb', region_name=ddb_region)
 dynamodb_adapter = DynamoDbAdapter(
     table_name=ddb_table_name, create_table=False, dynamodb_resource=ddb_resource)
+
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -105,7 +108,7 @@ class ContentIntentHandler(AbstractRequestHandler):
             speak_output = "You are cooking a chicken"
         else:
             speak_output = "You are not cooking anything"
-            
+
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -386,8 +389,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 # defined are included below. The order matters - they're processed top to bottom.
 
 
-sb = SkillBuilder(persistence_adapter=dynamodb_adapter)
-
+sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelloWorldIntentHandler())
