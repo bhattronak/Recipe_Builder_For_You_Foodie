@@ -57,7 +57,25 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         )
 
 
-class ConentIntentHandler(AbstractRequestHandler):
+class StartCookingIntentHandler(AbstractExceptionHandler):
+    """Handler for Start Cooking Intent."""
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("StartCookingIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "I am starting to cook"
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+class ContentIntentHandler(AbstractRequestHandler):
     """ Content Intent Handler returns the current step to be done for cooking. It checks the state of cook wok from an external db and return the current step. """
 
     def can_handle(self, handler_input):
@@ -353,6 +371,16 @@ sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelloWorldIntentHandler())
+sb.add_request_handler(StartCookingIntentHandler())
+sb.add_request_handler(ContentIntentHandler())
+sb.add_request_handler(TempreatureIntentHandler())
+sb.add_request_handler(CookingSuggestionIntentHandler())
+sb.add_request_handler(NextIntentHandler())
+sb.add_request_handler(PreviousIntentHandler())
+sb.add_request_handler(IngredientIntentHandler())
+sb.add_request_handler(UtensilIntentHandler())
+sb.add_request_handler(TimeIntentHandler())
+sb.add_request_handler(CookingActionIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
