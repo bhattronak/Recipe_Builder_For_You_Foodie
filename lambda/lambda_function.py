@@ -15,7 +15,7 @@ from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 class LaunchRequestHandler(AbstractRequestHandler):
@@ -57,7 +57,7 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         )
 
 
-class StartCookingIntentHandler(AbstractExceptionHandler):
+class StartCookingIntentHandler(AbstractRequestHandler):
     """Handler for Start Cooking Intent."""
 
     def can_handle(self, handler_input):
@@ -74,6 +74,7 @@ class StartCookingIntentHandler(AbstractExceptionHandler):
             # .ask("add a reprompt if you want to keep the session open for the user to respond")
             .response
         )
+
 
 class ContentIntentHandler(AbstractRequestHandler):
     """ Content Intent Handler returns the current step to be done for cooking. It checks the state of cook wok from an external db and return the current step. """
@@ -189,7 +190,7 @@ class UtensilIntentHandler(AbstractRequestHandler):
         )
 
 
-class TimeIntentHandler(AbstractExceptionHandler):
+class TimeIntentHandler(AbstractRequestHandler):
     """Time Intent Handler returns the time required for cooking. It checks the state of cook wok from an external db and return the time. """
 
     def can_handle(self, handler_input):
@@ -208,7 +209,7 @@ class TimeIntentHandler(AbstractExceptionHandler):
         )
 
 
-class TempreatureIntentHandler(AbstractExceptionHandler):
+class TempreatureIntentHandler(AbstractRequestHandler):
     """Tempreature Intent Handler returns the temperature required for cooking. It checks the state of cook wok from an external db and return the temperature. """
 
     def can_handle(self, handler_input):
@@ -218,7 +219,6 @@ class TempreatureIntentHandler(AbstractExceptionHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         speak_output = "It needs 100 degree celsius to cook."
-
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -227,7 +227,7 @@ class TempreatureIntentHandler(AbstractExceptionHandler):
         )
 
 
-class CookingSuggestionIntentHandler(AbstractExceptionHandler):
+class CookingSuggestionIntentHandler(AbstractRequestHandler):
     """Cooking Suggestion Intent Handler returns the suggestions for cooking. It checks the state of cook wok from an external db and return the suggestions. """
 
     def can_handle(self, handler_input):
@@ -369,17 +369,18 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 
 sb = SkillBuilder()
 
+
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelloWorldIntentHandler())
 sb.add_request_handler(StartCookingIntentHandler())
 sb.add_request_handler(ContentIntentHandler())
-sb.add_request_handler(TempreatureIntentHandler())
 sb.add_request_handler(CookingSuggestionIntentHandler())
 sb.add_request_handler(NextIntentHandler())
 sb.add_request_handler(PreviousIntentHandler())
 sb.add_request_handler(IngredientIntentHandler())
 sb.add_request_handler(UtensilIntentHandler())
 sb.add_request_handler(TimeIntentHandler())
+sb.add_request_handler(TempreatureIntentHandler())
 sb.add_request_handler(CookingActionIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
