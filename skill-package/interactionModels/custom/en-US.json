@@ -1,0 +1,181 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "cook wok",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "HelloWorldIntent",
+          "slots": [],
+          "samples": [
+            "hello",
+            "how are you",
+            "say hi world",
+            "say hi",
+            "hi",
+            "say hello world",
+            "say hello"
+          ]
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "searchRecipeIntent",
+          "slots": [],
+          "samples": [
+            "what is in the list",
+            "What is in the saved list",
+            "What am I cooking today"
+          ]
+        },
+        {
+          "name": "selectRecipeIntent",
+          "slots": [
+            {
+              "name": "recipe",
+              "type": "AMAZON.Food"
+            },
+            {
+              "name": "id",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "Lets cook the {recipe}"
+          ]
+        },
+        {
+          "name": "ContentIntent",
+          "slots": [],
+          "samples": [
+            "What now",
+            "What should I do now",
+            "What do I need to do"
+          ]
+        },
+        {
+          "name": "NextIntent",
+          "slots": [],
+          "samples": [
+            "now what",
+            "What next",
+            "what should I do next"
+          ]
+        },
+        {
+          "name": "PreviousIntent",
+          "slots": [],
+          "samples": [
+            "what did I do in the last step",
+            "What was the last step"
+          ]
+        },
+        {
+          "name": "CookingActionIntent",
+          "slots": [],
+          "samples": [
+            "I have it now what should I do with it",
+            "What do I need to with this"
+          ]
+        },
+        {
+          "name": "IngredientIntent",
+          "slots": [],
+          "samples": [
+            "What all do I need to prepare that",
+            "What ingredients do I need"
+          ]
+        },
+        {
+          "name": "TimeIntent",
+          "slots": [],
+          "samples": [
+            "For how much time do I need to cook it"
+          ]
+        },
+        {
+          "name": "TempreatureIntent",
+          "slots": [],
+          "samples": [
+            "How much tempreature to set ",
+            "How much tempreature to cook "
+          ]
+        },
+        {
+          "name": "CookingSuggestionIntent",
+          "slots": [],
+          "samples": [
+            "Anything else for this step",
+            "Do I need to take care of anything else "
+          ]
+        },
+        {
+          "name": "UtensilIntent",
+          "slots": [],
+          "samples": [
+            "What utensil do I need",
+            "What utensil do i need for this step"
+          ]
+        }
+      ],
+      "types": []
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "selectRecipeIntent",
+          "confirmationRequired": true,
+          "prompts": {
+            "confirmation": "Confirm.Intent.302804731656"
+          },
+          "slots": [
+            {
+              "name": "recipe",
+              "type": "AMAZON.Food",
+              "elicitationRequired": false,
+              "confirmationRequired": false,
+              "prompts": {}
+            },
+            {
+              "name": "id",
+              "type": "AMAZON.NUMBER",
+              "elicitationRequired": false,
+              "confirmationRequired": false,
+              "prompts": {}
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Confirm.Intent.302804731656",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Do you want to cook {recipe} "
+          }
+        ]
+      }
+    ]
+  },
+  "version": "3"
+}
