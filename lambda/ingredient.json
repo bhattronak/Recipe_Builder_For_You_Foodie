@@ -1,0 +1,39 @@
+{
+  "link": "https://www.allrecipes.com/recipe/240652/paneer-tikka-masala/",
+  "ingredientList": [
+    {
+      "qty": 1,
+      "unit": "cup",
+      "name": "plain yogurt"
+    },
+    {
+      "qty": 1,
+      "unit": "tablespoon",
+      "name": "ground cumin"
+    }
+  ],
+  "prepTime:": {
+    "qty": 15,
+    "unit": "minutes"
+  },
+  "cookTime:": {
+    "qty": 1,
+    "unit": "hour"
+  },
+  "totalTime:": {
+    "qty": 50,
+    "unit": "mins"
+  },
+  "servings:": 6,
+  "steps": [
+    {
+      "step": 1,
+      "text": "In a large bowl, mix together the yogurt and cumin. Add the paneer and toss to coat. Cover and refrigerate for at least 1 hour."
+    },
+    {
+      "step": 2,
+      "text": "Preheat the oven to 400 degrees F (200 degrees C)."
+    }
+  ],
+  "topYouTubeLink": "https://www.youtube.com/watch?v=hsR0JaD1TyA"
+}
