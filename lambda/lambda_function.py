@@ -80,12 +80,15 @@ class StartCookingIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        session_attr = handler_input.attributes_manager.session_attributes
-        session_attr['state'] = "STARTED"
-        handler_input.attributes_manager.persistent_attributes = session_attr
-        handler_input.attributes_manager.save_persistent_attributes()
-        speak_output = "I am starting to cook"
+        
+        attr = handler_input.attributes_manager.persistent_attributes
+        if not attr:
+            attr['state'] = 'STARTED'
 
+        handler_input.attributes_manager.session_attributes = attr
+
+        speak_output = "I am starting to cook"
+        handler_input.attributes_manager.save_persistent_attributes()
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -104,10 +107,14 @@ class ContentIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.session_attributes
-        if session_attr['state'] == "STARTED":
-            speak_output = "You are cooking a chicken"
+        if "state" in session_attr:
+            state = session_attr["state"]
+            if state == "STARTED":
+                speak_output = "I am cooking"
+            else:
+                speak_output = "I am not cooking"
         else:
-            speak_output = "You are not cooking anything"
+            speak_output = "I am not cooking"
 
         return (
             handler_input.response_builder
