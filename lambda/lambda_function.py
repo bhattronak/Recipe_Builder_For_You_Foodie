@@ -20,6 +20,7 @@ logger.setLevel(logging.INFO)
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
 
@@ -31,14 +32,15 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
+            .speak(speak_output)
+            .ask(speak_output)
+            .response
         )
 
 
 class HelloWorldIntentHandler(AbstractRequestHandler):
     """Handler for Hello World Intent."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("HelloWorldIntent")(handler_input)
@@ -49,14 +51,186 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class ConentIntentHandler(AbstractRequestHandler):
+    """ Content Intent Handler returns the current step to be done for cooking. It checks the state of cook wok from an external db and return the current step. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("ContentIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You are in step 1. Add the ingredients to the wok. You can say next to move to the next step."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class NextIntentHandler(AbstractRequestHandler):
+    """ Next Intent Handler returns the next step to be done for cooking. It checks the state of cook wok from an external db and return the next step. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("NextIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You are in step 2. Stir the ingredients for 2 minutes. You can say next to move to the next step."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class PreviousIntentHandler(AbstractRequestHandler):
+    """ Previous Intent Handler returns the previous step to be done for cooking. It checks the state of cook wok from an external db and return the previous step. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("PreviousIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You are in step 1. Add the ingredients to the wok. You can say next to move to the next step."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class CookingActionIntentHandler(AbstractRequestHandler):
+    """Cooking Action Intent Handler takes an input and returns the details of cooking action. For example if the user says stir, it returns the details of stir action. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("CookingActionIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "Stir the ingredients for 2 minutes."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class IngredientIntentHandler(AbstractRequestHandler):
+    """Ingredient Intent Handler returns the ingredients required for cooking. It checks the state of cook wok from an external db and return the ingredients. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("IngredientIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You need 2 cups of rice, 1 cup of water, 1 cup of oil, 1 cup of salt, 1 cup of pepper, 1 cup of chicken."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class UtensilIntentHandler(AbstractRequestHandler):
+    """Utenstil Intent Handler returns the utensils required for cooking. It checks the state of cook wok from an external db and return the utensils. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("UtensilIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You need a wok, a spoon, a knife."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class TimeIntentHandler(AbstractExceptionHandler):
+    """Time Intent Handler returns the time required for cooking. It checks the state of cook wok from an external db and return the time. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("TimeIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "It takes 10 minutes to cook."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class TempreatureIntentHandler(AbstractExceptionHandler):
+    """Tempreature Intent Handler returns the temperature required for cooking. It checks the state of cook wok from an external db and return the temperature. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("TempreatureIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "It needs 100 degree celsius to cook."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
+        )
+
+
+class CookingSuggestionIntentHandler(AbstractExceptionHandler):
+    """Cooking Suggestion Intent Handler returns the suggestions for cooking. It checks the state of cook wok from an external db and return the suggestions. """
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("CookingSuggestionIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        speak_output = "You can add more chicken to the wok."
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
         )
 
 
 class HelpIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("AMAZON.HelpIntent")(handler_input)
@@ -67,14 +241,15 @@ class HelpIntentHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
+            .speak(speak_output)
+            .ask(speak_output)
+            .response
         )
 
 
 class CancelOrStopIntentHandler(AbstractRequestHandler):
     """Single handler for Cancel and Stop Intent."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
@@ -86,12 +261,14 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .response
+            .speak(speak_output)
+            .response
         )
+
 
 class FallbackIntentHandler(AbstractRequestHandler):
     """Single handler for Fallback Intent."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("AMAZON.FallbackIntent")(handler_input)
@@ -104,8 +281,10 @@ class FallbackIntentHandler(AbstractRequestHandler):
 
         return handler_input.response_builder.speak(speech).ask(reprompt).response
 
+
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
@@ -124,6 +303,7 @@ class IntentReflectorHandler(AbstractRequestHandler):
     for your intents by defining them above, then also adding them to the request
     handler chain below.
     """
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return ask_utils.is_request_type("IntentRequest")(handler_input)
@@ -135,9 +315,9 @@ class IntentReflectorHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
+            .speak(speak_output)
+            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            .response
         )
 
 
@@ -146,6 +326,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
     stating the request handler chain is not found, you have not implemented a handler for
     the intent being invoked or included it in the skill builder below.
     """
+
     def can_handle(self, handler_input, exception):
         # type: (HandlerInput, Exception) -> bool
         return True
@@ -158,9 +339,9 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
+            .speak(speak_output)
+            .ask(speak_output)
+            .response
         )
 
 # The SkillBuilder object acts as the entry point for your skill, routing all request and response
@@ -176,7 +357,8 @@ sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
-sb.add_request_handler(IntentReflectorHandler()) # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+# make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+sb.add_request_handler(IntentReflectorHandler())
 
 sb.add_exception_handler(CatchAllExceptionHandler())
 
