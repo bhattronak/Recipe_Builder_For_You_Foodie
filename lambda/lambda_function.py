@@ -16,6 +16,7 @@ from ask_sdk_model import Response
 
 import os
 import boto3
+import json
 
 from ask_sdk_core.skill_builder import CustomSkillBuilder
 from ask_sdk_dynamodb.adapter import DynamoDbAdapter
@@ -61,8 +62,17 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Hello World!"
-
+        attr = handler_input.attributes_manager.persistent_attributes
+        if not attr:
+            data = json.loads('{"link":"https://www.allrecipes.com/recipe/240652/paneer-tikka-masala/","ingredientList":[{"qty":1,"unit":"cup","name":"plain yogurt"},{"qty":1,"unit":"tablespoon","name":"ground cumin"}],"prepTime:":{"qty":15,"unit":"minutes"},"cookTime:":{"qty":1,"unit":"hour"},"totalTime:":{"qty":50,"unit":"mins"},"servings:":6,"steps":[{"step":1,"text":"In a large bowl, mix together the yogurt and cumin. Add the paneer and toss to coat. Cover and refrigerate for at least 1 hour."},{"step":2,"text":"Preheat the oven to 400 degrees F (200 degrees C)."}],"recipeName":"Paneer Tikka Masala","topYouTubeLink":"https://www.youtube.com/watch?v=hsR0JaD1TyA"}')
+            data["id"] = 1
+            if "recipes" not in attr:
+                attr["recipe"] = data
+                speak_output = f"Hello there! I'm a recipe bot. I'm going to help you cook a delicious meal. I'm setting up your recipe now. Please wait. I'm done setting up your recipe {attr.recipe.recipeName}. Would you like to start cooking?"
+                handler_input.attributes_manager.persistent_attributes = attr
+                handler_input.attributes_manager.save_persistent_attributes()
+            else:
+                speak_output = "You already have a recipe set up. Would you like to start cooking?"
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -80,15 +90,15 @@ class StartCookingIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        
+
         attr = handler_input.attributes_manager.persistent_attributes
-        if not attr:
-            attr['state'] = 'STARTED'
-
-        handler_input.attributes_manager.session_attributes = attr
-
-        speak_output = "I am starting to cook"
-        handler_input.attributes_manager.save_persistent_attributes()
+        if "recipes" in attr:
+            attr['status'] = 'STARTED'
+            speak_output = f"Great! Let's get started. The first step is {attr.recipe.steps[0].text}. Would you like to hear the next step?"
+            handler_input.attributes_manager.persistent_attributes = attr
+            handler_input.attributes_manager.save_persistent_attributes()
+        else:
+            speak_output = "You don't have a recipe set up. Would you like to set one up?"
         return (
             handler_input.response_builder
             .speak(speak_output)
