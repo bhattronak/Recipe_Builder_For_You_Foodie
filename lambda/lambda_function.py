@@ -11,12 +11,23 @@ from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
+from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 
 from ask_sdk_model import Response
+
+import boto3
+import os
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+ddb_region = os.environ.get('DYNAMODB_PERSISTENCE_REGION')
+ddb_table_name = os.environ.get('DYNAMODB_PERSISTENCE_TABLE_NAME')
+
+ddb_resource = boto3.resource('dynamodb', region_name=ddb_region)
+dynamodb_adapter = DynamoDbAdapter(
+    table_name=ddb_table_name, create_table=False, dynamodb_resource=ddb_resource)
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -66,6 +77,10 @@ class StartCookingIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        session_attr = handler_input.attributes_manager.session_attributes
+        session_attr['state'] = "STARTED"
+        handler_input.attributes_manager.persistent_attributes = session_attr
+        handler_input.attributes_manager.save_persistent_attributes()
         speak_output = "I am starting to cook"
 
         return (
@@ -85,8 +100,12 @@ class ContentIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You are in step 1. Add the ingredients to the wok. You can say next to move to the next step."
-
+        session_attr = handler_input.attributes_manager.session_attributes
+        if session_attr['state'] == "STARTED":
+            speak_output = "You are cooking a chicken"
+        else:
+            speak_output = "You are not cooking anything"
+            
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -367,7 +386,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 # defined are included below. The order matters - they're processed top to bottom.
 
 
-sb = SkillBuilder()
+sb = SkillBuilder(persistence_adapter=dynamodb_adapter)
 
 
 sb.add_request_handler(LaunchRequestHandler())
@@ -384,6 +403,7 @@ sb.add_request_handler(TempreatureIntentHandler())
 sb.add_request_handler(CookingActionIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
+sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
