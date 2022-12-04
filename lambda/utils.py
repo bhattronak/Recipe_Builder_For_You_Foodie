@@ -2,6 +2,7 @@ import logging
 import os
 import boto3
 from botocore.exceptions import ClientError
+import json
 
 
 def create_presigned_url(object_name):
@@ -11,8 +12,9 @@ def create_presigned_url(object_name):
     :return: Presigned URL as string. If error, returns None.
     """
     s3_client = boto3.client('s3',
-                             region_name=os.environ.get('S3_PERSISTENCE_REGION'),
-                             config=boto3.session.Config(signature_version='s3v4',s3={'addressing_style': 'path'}))
+                             region_name=os.environ.get(
+                                 'S3_PERSISTENCE_REGION'),
+                             config=boto3.session.Config(signature_version='s3v4', s3={'addressing_style': 'path'}))
     try:
         bucket_name = os.environ.get('S3_PERSISTENCE_BUCKET')
         response = s3_client.generate_presigned_url('get_object',
@@ -30,22 +32,18 @@ def create_presigned_url(object_name):
 def recipe_parser(url):
     """Return a recipe for the given URL"""
     import requests
-    import json
-    import BeautifulSoup
-    import googlesearch
+    from bs4 import BeautifulSoup
+    from googlesearch import search
 
     jdict = {}
-    allwebsites = []
-    try:
-        from googlesearch import search
-    except ImportError:
-        print("No module named 'google' found")
 
-  
-    # Get the recipe
+    jdict['link'] = url
+    # -----------------------------------------------------------------------------------------------------------------
+    neededwebsite = url
+
     try:  # because if url is invalid then it supposed to give error which will be return from Exception
-        source = requests.get(url)
-        ## print(type(source))
+        source = requests.get(neededwebsite)
+        # print(type(source))
         source.raise_for_status()
         # Type of variable soup is BeautifulSoup # It's text of html text of given website.
         soup = BeautifulSoup(source.text, 'html.parser')
@@ -53,11 +51,10 @@ def recipe_parser(url):
         # We wrote it beause of "table class="wikitable" style="width=100%"
         required = soup.find('ul', class_="mntl-structured-ingredients__list")
         # find will find perticular x ....... /x that x from whole html text
-        ## print(table) # table is for this table in
-        ## print(type(source))
+        # print(table) # table is for this table in
+        # print(type(source))
     except Exception as e:
         print(e)
-
     htmlofitems = required.find_all('p')
 
     spanhtml = []
@@ -66,8 +63,8 @@ def recipe_parser(url):
         spanhtml.append(spanhtml1)
     listofallitem = []
 
-    #FOR jdict library
-    #jdict=dict()
+    # FOR jdict library
+    # jdict=dict()
     jdict1 = dict()
     jlist = []
     for i in range(len(spanhtml)):
@@ -75,18 +72,18 @@ def recipe_parser(url):
         singledict = dict()
         for j in range(0, len(spanhtml[i])):
             if spanhtml[i][j].text:
-                ## print(spanhtml[i][j].text)
+                # print(spanhtml[i][j].text)
                 if spanhtml[i][j].get("data-ingredient-quantity") == 'true':
-                    singledict["qun"] = spanhtml[i][j].text
+                    singledict["qty"] = spanhtml[i][j].text
                 elif spanhtml[i][j].get("data-ingredient-unit") == 'true':
-                    singledict["utensils"] = spanhtml[i][j].text
+                    singledict["unit"] = spanhtml[i][j].text
                 elif spanhtml[i][j].get("data-ingredient-name") == 'true':
-                    singledict["ingredients"] = spanhtml[i][j].text
-    ## print(singledict)
-    jlist.append(singledict)
+                    singledict["ingredient"] = spanhtml[i][j].text
+    # print(singledict)
+        jlist.append(singledict)
     jdict['ingredients'] = jlist
-    ## print(jdict)
-    #now give value to jdict key & val as this dict
+    # print(jdict)
+    # now give value to jdict key & val as this dict
 
     for i in range(len(spanhtml)):
         singleitem = []
@@ -99,20 +96,23 @@ def recipe_parser(url):
         'div', class_="mntl-recipe-details__value")
     cooktime_Numberof_people_catagory = soup.find_all(
         'div', class_="mntl-recipe-details__label")
-    # print(" ")
-    # print("Details for this recipe:")
-    # print(" ")
-    # print(" ")
-    # print("Here is list of all ingredients needed with it's quantity:")
-    # print(" ")
+    print(" ")
+    print("Details for this recipe:")
+    print(" ")
+    for i in range(len(cooktime_Numberof_people_catagory)):
+        key = cooktime_Numberof_people_catagory[i].text.lower()
+        # Transform key
+        key = key.replace(" ", "_")
+        value = cooktime_Numberof_people_numerical[i].text
+        jdict[key] = value
     id_ing = 1
     for i in listofallitem:
-        # print(f'{id_ing}":"{i}')
-        id_ing = id_ing + 1
-    # print(singleitem)
-    # print(" ")
-    # print("Let's look at steps for recipe:")
-    # # print(" ")
+        print(f'{id_ing}":"{i}')
+        id_ing = id_ing+1
+    print(singleitem)
+    print(" ")
+    print("Let's look at steps for recipe:")
+    print(" ")
     requiredforstep = soup.find(
         'ol', class_="comp mntl-sc-block-group--OL mntl-sc-block mntl-sc-block-startgroup")
     stephtml = requiredforstep.find_all('li')
@@ -120,20 +120,24 @@ def recipe_parser(url):
     for i in range(len(stephtml)):
         steps.append([f"Step Number {i+1}: {stephtml[i].text.strip()}"])
 
-    #jdict for steps
-    #jdict=dict()
+    # jdict for steps
+    # jdict=dict()
     jlist = []
     for i in range(len(stephtml)):
         jdict1 = dict()
         jdict1['step'] = i
         jdict1['text'] = stephtml[i].text.strip()
-        ## print(jdict1)
+        # print(jdict1)
         jlist.append(jdict1)
     jdict['steps'] = jlist
-    #jdict
-    #now add this to final code
+    # jdict
+    # now add this to final code
 
-  
+    for i in steps:
+        for j in i:
+            print(j)
+            print(" ")
+    print("You can refer same recipe via youtube based on video link below,which is best recommendation of YouTube:")
 
     queryforyoutube = "youtube"+"Paneer Tikka"
     youtubesites = []
@@ -143,7 +147,14 @@ def recipe_parser(url):
     for web in youtubesites:
         if 'youtube' in str(web):
             topyoutubesite.append(web)
-
+    print(topyoutubesite[0])
     jdict['TopYouTubelink'] = topyoutubesite[0]
-
+    print(json.dumps(jdict))
     return jdict
+
+
+if __name__ == '__main__':
+    # This is used when running locally. Gunicorn is used to run the
+    # application on Google App Engine. See entrypoint in app.yaml.
+    print(recipe_parser(
+        "https://www.allrecipes.com/recipe/8511288/washington-apple-cocktail/"))

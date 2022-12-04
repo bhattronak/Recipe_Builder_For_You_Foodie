@@ -175,7 +175,9 @@ class StartCookingIntentHandler(AbstractRequestHandler):
         for ingredient in recipe['ingredients']:
             speak_output += f"{ingredient}. "
         #  Add preparation time and cooking time
-        speak_output += f"Preparation time is {recipe['preparation_time']} minutes. Cooking time is {recipe['cooking_time']} minutes. Would you like to start cooking?"
+        if recipe['prep_time'] is not None and recipe['cook_time'] is not None:
+            speak_output += f"Preparation time is {recipe['prep_time']}. Cooking time is {recipe['cook_time']}."
+        
         if attr['state'] == 'start_cooking':
             session_attr = {**recipe}
             session_attr['selected_recipe'] = attr['selected_recipe']
