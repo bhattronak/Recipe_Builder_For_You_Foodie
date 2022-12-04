@@ -440,6 +440,16 @@ class TempreatureIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        tempreature_lexicon = {'cool oven': '200 °F or 90 °C',
+                     'very slow oven': '250 °F or 120 °C',
+                     'slow oven': '300-325 °F or 150-160 °C',
+                     'moderate oven': '350-375 °F or 180-190 °C',
+                     'moderately hot': '375-400 °F or 190-200 °C',
+                     'hot oven': '400-450 °F or 200-230 °C',
+                     'very hot oven': '450-500 °F or 230-260 °C',
+                     'fast oven': '450-500 °F or 230-260 °C',
+                     'moderately slow': '325-350 °F or 160-180 °C'
+                     }
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
             step = session_attr['steps'][session_attr['step']]['text']
@@ -468,6 +478,10 @@ class TempreatureIntentHandler(AbstractRequestHandler):
                 if word in ['low', 'medium', 'high']:
                     speak_output.append(
                         f'{word} heat ')
+                if word in tempreature_lexicon:
+                    speak_output.append(
+                        f'{word} ')
+                        
 
             speak_output = " ".join(speak_output)
             if speak_output == "":
