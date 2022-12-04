@@ -92,7 +92,7 @@ class StartCookingIntentHandler(AbstractRequestHandler):
         speak_output = f"Okay! You need to select the recipe first!!!"
         if attr["recipe_id"]:
             session_attr = {**attr, **data}
-            session_attr["step"] = 1
+            session_attr["step"] = 0
             session_attr["state"] = "cooking"
             handler_input.attributes_manager.persistent_attributes = session_attr
             handler_input.attributes_manager.save_persistent_attributes()
@@ -118,7 +118,9 @@ class ContentIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.session_attributes
         if session_attr["state"] == "cooking":
-            speak_output = f"The current step is {session_attr.steps[session_attr.step].text}. Would you like to hear the next step?"
+            # Find the step in steps lists
+            step = session_attr["steps"].index(lambda d: d.step == session_attr["step"])
+            speak_output = f"The current step is {session_attr.steps[step].text}. Would you like to hear the next step?"
         else:
             speak_output = f"Please select a recipe first."
         return (
