@@ -118,7 +118,7 @@ class ContentIntentHandler(AbstractRequestHandler):
         if session_attr['state'] == 'cooking':
             # Find the step in steps lists
             step = session_attr["steps"].index(
-                lambda d: d.step == session_attr["step"])
+                lambda d: d.step == session_attr["step"]+1)
             console.log(step)
             speak_output = f"The current step is {session_attr['steps'][step]['text']}. Would you like to hear the next step?"
         else:
