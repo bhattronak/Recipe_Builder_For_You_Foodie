@@ -73,7 +73,7 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         return (
             handler_input.response_builder
             .speak(speak_output)
-            # .ask("add a reprompt if you want to keep the session open for the user to respond")
+            # .ask('add a reprompt if you want to keep the session open for the user to respond')
             .response
         )
 
@@ -83,22 +83,20 @@ class StartCookingIntentHandler(AbstractRequestHandler):
 
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        return ask_utils.is_intent_name("StartCookingIntent")(handler_input)
+        return ask_utils.is_intent_name('StartCookingIntent')(handler_input)
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         data = json.loads('{"link":"https://www.allrecipes.com/recipe/240652/paneer-tikka-masala/","ingredientList":[{"qty":1,"unit":"cup","name":"plain yogurt"},{"qty":1,"unit":"tablespoon","name":"ground cumin"}],"prepTime:":{"qty":15,"unit":"minutes"},"cookTime:":{"qty":1,"unit":"hour"},"totalTime:":{"qty":50,"unit":"mins"},"servings:":6,"steps":[{"step":1,"text":"In a large bowl, mix together the yogurt and cumin. Add the paneer and toss to coat. Cover and refrigerate for at least 1 hour."},{"step":2,"text":"Preheat the oven to 400 degrees F (200 degrees C)."}],"recipeName":"Paneer Tikka Masala","topYouTubeLink":"https://www.youtube.com/watch?v=hsR0JaD1TyA"}')
         attr = handler_input.attributes_manager.persistent_attributes
-        speak_output = f"Okay! You need to select the recipe first!!!"
-        if attr["recipe_id"]:
+        speak_output = f'Okay! You need to select the recipe first!!!'
+        if attr['recipe_id']:
             session_attr = {**attr, **data}
-            session_attr["step"] = 0
-            session_attr["state"] = "cooking"
+            session_attr['step'] = 0
+            session_attr['state'] = 'cooking'
+            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}.  The first step is {session_attr["steps"][0]["text"]}. Would you like to hear the next step?'  
             handler_input.attributes_manager.persistent_attributes = session_attr
             handler_input.attributes_manager.save_persistent_attributes()
-            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}.  The first step is {session_attr["steps"][0]["text"]}. Would you like to hear the next step?'
-            
-           
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -112,12 +110,12 @@ class ContentIntentHandler(AbstractRequestHandler):
 
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        return ask_utils.is_intent_name("ContentIntent")(handler_input)
+        return ask_utils.is_intent_name('ContentIntent')(handler_input)
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        session_attr = handler_input.attributes_manager.session_attributes
-        if session_attr["state"] == "cooking":
+        session_attr = handler_input.attributes_manager.persistent_attributes
+        if session_attr['state'] == 'cooking':
             # Find the step in steps lists
             step = session_attr["steps"].index(lambda d: d.step == session_attr["step"])
             speak_output = f"The current step is {session_attr.steps[step].text}. Would you like to hear the next step?"
@@ -140,7 +138,7 @@ class NextIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        session_attr = handler_input.attributes_manager.session_attributes
+        session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
             session_attr["step"] += 1
             if session_attr["step"] == len(session_attr["steps"]):
@@ -167,7 +165,7 @@ class PreviousIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        session_attr = handler_input.attributes_manager.session_attributes
+        session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
             session_attr["step"] -= 1
             if session_attr["step"] == 0:
