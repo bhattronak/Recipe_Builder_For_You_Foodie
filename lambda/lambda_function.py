@@ -117,9 +117,10 @@ class ContentIntentHandler(AbstractRequestHandler):
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr['state'] == 'cooking':
             # Find the step in steps lists
-            step = session_attr["steps"].index(
-                lambda d: d.step == session_attr["step"])
-            speak_output = f"The current step is {session_attr['steps'][step]['text']}. Would you like to hear the next step?"
+            step = list(filter(lambda step: step['step'] == session_attr['step'], session_attr['steps']))
+            if len(step)>0:
+                step = step[0]['text']
+            speak_output = f"The current step is {step}. Would you like to hear the next step?"
         else:
             speak_output = f"Please select a recipe first."
 
