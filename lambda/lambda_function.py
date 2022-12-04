@@ -96,7 +96,7 @@ class StartCookingIntentHandler(AbstractRequestHandler):
             session_attr["state"] = "cooking"
             handler_input.attributes_manager.persistent_attributes = session_attr
             handler_input.attributes_manager.save_persistent_attributes()
-            speak_output = f"Great! Let's get started. I'm setting up your recipe now. Please wait. I'm done setting up your recipe { session_attr.recipeName }.  The first step is {session_attr.steps[0].text}. Would you like to hear the next step?"
+            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}.  The first step is {session_attr["steps"][0]["text"]}. Would you like to hear the next step?'
             
            
         return (
