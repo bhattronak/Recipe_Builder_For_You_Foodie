@@ -117,9 +117,8 @@ class ContentIntentHandler(AbstractRequestHandler):
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr['state'] == 'cooking':
             # Find the step in steps lists
-            step = list(filter(
-                lambda step: step['step'] == session_attr['step'], session_attr['steps']))
-            if len(step) > 0:
+            step = list(filter(lambda step: step['step'] == session_attr['step'], session_attr['steps']))
+            if len(step)>0:
                 step = step[0]['text']
             speak_output = f"The current step is {step}. Would you like to hear the next step?"
         else:
@@ -147,9 +146,9 @@ class NextIntentHandler(AbstractRequestHandler):
             session_attr["step"] = int(session_attr["step"]) + 1
             if session_attr["step"] == len(session_attr["steps"]):
                 speak_output = f"You have completed the recipe. Would you like to start another recipe?"
-                session_attr["state"] = "idle"
+                # session_attr["state"] = "idle"
             else:
-                speak_output = f"The next step is {session_attr['steps']int([session_attr['step']])['text']}. Would you like to hear the next step?"
+                speak_output = f"The next step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
                 handler_input.attributes_manager.persistent_attributes = session_attr
                 handler_input.attributes_manager.save_persistent_attributes()
         else:
@@ -173,13 +172,13 @@ class PreviousIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
-            session_attr["step"] = int(session_attr["step"]) - 1
-            if session_attr["step"] == 0:
-                speak_output = f"You are at the first step. Would you like to hear the next step?"
-            else:
+            if session_attr["step"] > 0:
+                session_attr["step"] = int(session_attr["step"]) - 1
                 speak_output = f"The previous step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
-                handler_input.attributes_manager.persistent_attributes = session_attr
-                handler_input.attributes_manager.save_persistent_attributes()
+            elif session_attr["step"] == 0:
+                speak_output = f"You are at the first step. The step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
+            handler_input.attributes_manager.persistent_attributes = session_attr
+            handler_input.attributes_manager.save_persistent_attributes()
         else:
             speak_output = f"Please select a recipe first."
 
