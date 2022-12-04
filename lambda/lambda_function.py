@@ -135,9 +135,7 @@ class AvailableRecipeIntentHandler(AbstractRequestHandler):
 
 class SelectRecipeIntentHandler(AbstractRequestHandler):
     """Handler for Select Recipe Intent."""
-
-   
-
+    
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("SelectRecipeIntent")(handler_input)
@@ -479,7 +477,6 @@ class UtensilIntentHandler(AbstractRequestHandler):
             "grill tray": "Grill Tray",
             "grill basket": "Grill Basket",
         }
-
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
             step = session_attr['steps'][session_attr['step']]['text']
