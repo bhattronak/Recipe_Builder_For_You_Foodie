@@ -131,10 +131,6 @@
           "slots": [
             {
               "name": "count",
-              "type": "AMAZON.NUMBER"
-            },
-            {
-              "name": "count_string",
               "type": "AMAZON.Ordinal"
             }
           ],

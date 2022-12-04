@@ -136,16 +136,40 @@ class AvailableRecipeIntentHandler(AbstractRequestHandler):
 class SelectRecipeIntentHandler(AbstractRequestHandler):
     """Handler for Select Recipe Intent."""
 
+   
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("SelectRecipeIntent")(handler_input)
 
     def handle(self, handler_input):
+        ordinal_number_map = {
+            'first': 1,
+            'second': 2,
+            'third': 3,
+            'fourth': 4,
+            'fifth': 5,
+            'sixth': 6,
+            'seventh': 7,
+            'eighth': 8,
+            'ninth': 9,
+            'tenth': 10,
+            'eleventh': 11,
+            'twelfth': 12,
+            'thirteenth': 13,
+            'fourteenth': 14,
+            'fifteenth': 15,
+            'sixteenth': 16,
+            'seventeenth': 17,
+            'eighteenth': 18,
+            'nineteenth': 19,
+            'twentieth': 20,
+        }
         # type: (HandlerInput) -> Response
         attr = handler_input.attributes_manager.persistent_attributes
         available_recipe = attr['available_recipe']
-        selected_recipe = handler_input.request_envelope.request.intent.slots['recipe'].value
-        selected_recipe = int(selected_recipe) - 1
+        selected_recipe = handler_input.request_envelope.request.intent.slots['count'].value
+        selected_recipe = int(ordinal_number_map[selected_recipe]) - 1
         speak_output = f"You have selected {available_recipe[selected_recipe]['name']}. Would you like to start cooking?"
 
         attr['state'] = 'start_cooking'
