@@ -192,7 +192,7 @@ class StartCookingIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         attr = handler_input.attributes_manager.persistent_attributes
         selected_recipe = attr['selected_recipe']
-        recipe = recipe_parser.get_recipe(selected_recipe['url'])
+        recipe = recipe_parser(selected_recipe['url'])
         speak_output = f"Here are the ingredients: "
         for ingredient in recipe['ingredients']:
             speak_output += f"{ingredient}. "
