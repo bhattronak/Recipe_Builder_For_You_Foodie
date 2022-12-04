@@ -143,17 +143,16 @@ class NextIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
-            session_attr["step"] += 1
+            session_attr["step"] = int(session_attr["step"]) + 1
             if session_attr["step"] == len(session_attr["steps"]):
                 speak_output = f"You have completed the recipe. Would you like to start another recipe?"
                 session_attr["state"] = "idle"
             else:
-                speak_output = f"The next step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
+                speak_output = f"The next step is {session_attr['steps']int([session_attr['step']])['text']}. Would you like to hear the next step?"
+                handler_input.attributes_manager.persistent_attributes = session_attr
+                handler_input.attributes_manager.save_persistent_attributes()
         else:
             speak_output = f"Please select a recipe first."
-
-        handler_input.attributes_manager.persistent_attributes = session_attr
-        handler_input.attributes_manager.save_persistent_attributes()
 
         return (
             handler_input.response_builder
@@ -173,11 +172,13 @@ class PreviousIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
-            session_attr["step"] -= 1
+            session_attr["step"] = int(session_attr["step"]) - 1
             if session_attr["step"] == 0:
                 speak_output = f"You are at the first step. Would you like to hear the next step?"
             else:
                 speak_output = f"The previous step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
+                handler_input.attributes_manager.persistent_attributes = session_attr
+                handler_input.attributes_manager.save_persistent_attributes()
         else:
             speak_output = f"Please select a recipe first."
 
