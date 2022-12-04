@@ -1,6 +1,6 @@
 boto3==1.9.216
 ask-sdk-core==1.11.0
 ask-sdk-dynamodb-persistence-adapter
-BeautifulSoup
+beautifulsoup4
 googlesearch
 json
