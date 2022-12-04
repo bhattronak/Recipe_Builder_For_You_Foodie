@@ -117,8 +117,9 @@ class ContentIntentHandler(AbstractRequestHandler):
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr['state'] == 'cooking':
             # Find the step in steps lists
-            step = list(filter(lambda step: step['step'] == session_attr['step'], session_attr['steps']))
-            if len(step)>0:
+            step = list(filter(
+                lambda step: step['step'] == session_attr['step'], session_attr['steps']))
+            if len(step) > 0:
                 step = step[0]['text']
             speak_output = f"The current step is {step}. Would you like to hear the next step?"
         else:
@@ -202,8 +203,79 @@ class CookingActionIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Stir the ingredients for 2 minutes."
-
+        session_attr = handler_input.attributes_manager.persistent_attributes
+        if session_attr["state"] == "cooking":
+            cooking_action_lexicon = {
+                "stir": "Stir the ingredients together.",
+                "mix": "Mix the ingredients together.",
+                "bake": "Bake the ingredients in the oven.",
+                "boil": "Boil the ingredients in a pot.",
+                "fry": "Fry the ingredients in a pan.",
+                "saute": "Saute the ingredients in a pan.",
+                "grill": "Grill the ingredients on a grill.",
+                "roast": "Roast the ingredients in the oven.",
+                "steam": "Steam the ingredients in a pot.",
+                "whisk": "Whisk the ingredients together.",
+                "blend": "Blend the ingredients together.",
+                "chop": "Chop the ingredients.",
+                "dice": "Dice the ingredients.",
+                "grate": "Grate the ingredients.",
+                "mince": "Mince the ingredients.",
+                "peel": "Peel the ingredients.",
+                "slice": "Slice the ingredients.",
+                "stir fry": "Stir fry the ingredients in a pan.",
+                "simmer": "Simmer the ingredients in a pot.",
+                "poach": "Poach the ingredients in a pot.",
+                "broil": "Broil the ingredients in the oven.",
+                "baste": "Baste the ingredients in a pan.",
+                "caramelize": "Caramelize the ingredients in a pan.",
+                "glaze": "Glaze the ingredients in a pan.",
+                "marinate": "Marinate the ingredients in a pan.",
+                "reduce": "Reduce the ingredients in a pan.",
+                "shred": "Shred the ingredients.",
+                "sift": "Sift the ingredients.",
+                "soak": "Soak the ingredients.",
+                "squeeze": "Squeeze the ingredients.",
+                "stirring": "Stir the ingredients together.",
+                "mixing": "Mix the ingredients together.",
+                "baking": "Bake the ingredients in the oven.",
+                "boiling": "Boil the ingredients in a pot.",
+                "frying": "Fry the ingredients in a pan.",
+                "sauteing": "Saute the ingredients in a pan.",
+                "grilling": "Grill the ingredients on a grill.",
+                "roasting": "Roast the ingredients in the oven.",
+                "steaming": "Steam the ingredients in a pot.",
+                "whisking": "Whisk the ingredients together.",
+                "blending": "Blend the ingredients together.",
+                "chopping": "Chop the ingredients.",
+                "dicing": "Dice the ingredients.",
+                "grating": "Grate the ingredients.",
+                "mincing": "Mince the ingredients.",
+                "peeling": "Peel the ingredients.",
+                "slicing": "Slice the ingredients.",
+                "stir frying": "Stir fry the ingredients in a pan.",
+                "simmering": "Simmer the ingredients in a pot.",
+                "poaching": "Poach the ingredients in a pot.",
+                "broiling": "Broil the ingredients in the oven.",
+                "basting": "Baste the ingredients in a pan.",
+                "caramelizing": "Caramelize the ingredients in a pan.",
+                "glazing": "Glaze the ingredients in a pan.",
+                "marinating": "Marinate the ingredients in a pan.",
+                "reducing": "Reduce the ingredients in a pan.",
+                "shredding": "Shred the ingredients.",
+                "sifting": "Sift the ingredients.",
+                "soaking": "Soak the ingredients.",
+                "squeezing": "Squeeze the ingredients.",
+            }
+            step = session_attr['steps'][session_attr['step']]['text']
+            step = step.lower()
+            step = step.split()
+            speak_output = []
+            for word in step:
+                if word in cooking_action_lexicon:
+                    speak_output.append(
+                        f'{word}-{cooking_action_lexicon[word]} ')
+            speak_output = " ".join(speak_output)
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -221,8 +293,21 @@ class IngredientIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You need 2 cups of rice, 1 cup of water, 1 cup of oil, 1 cup of salt, 1 cup of pepper, 1 cup of chicken."
-
+        ingredient_list = []
+        session_attr = handler_input.attributes_manager.persistent_attributes
+        for ingredient in session_attr["ingredients"]:
+            ingredient_list.append(ingredient["name"].lower())
+        if session_attr["state"] == "cooking":
+            step = session_attr['steps'][session_attr['step']]['text']
+            step = step.lower()
+            step = step.split()
+            speak_output = []
+            for word in step:
+                if word in ingredient_list:
+                    speak_output.append(word)
+            speak_output = ", ".join(speak_output)
+            if speak_output == "":
+                speak_output = "No ingredients found in this step."
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -240,7 +325,59 @@ class UtensilIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You need a wok, a spoon, a knife."
+        utensil_lexicon = {
+            "bowl": "Bowl",
+            "baking pan": "Baking Pan",
+            "baking sheet": "Baking Sheet",
+            "baking dish": "Baking Dish",
+            "baking tray": "Baking Tray",
+            "baking tin": "Baking Tin",
+            "baking mold": "Baking Mold",
+            "baking mould": "Baking Mould",
+            "baking form": "Baking Form",
+            "saucepan": "Saucepan",
+            "pot": "Pot",
+            "frying pan": "Frying Pan",
+            "grill": "Grill",
+            "oven": "Oven",
+            "microwave": "Microwave",
+            "blender": "Blender",
+            "food processor": "Food Processor",
+            "mixer": "Mixer",
+            "whisk": "Whisk",
+            "spatula": "Spatula",
+            "tongs": "Tongs",
+            "ladle": "Ladle",
+            "sieve": "Sieve",
+            "strainer": "Strainer",
+            "colander": "Colander",
+            "sifter": "Sifter",
+            "measuring cup": "Measuring Cup",
+            "measuring jug": "Measuring Jug",
+            "measuring spoon": "Measuring Spoon",
+            "measuring stick": "Measuring Stick",
+            "pan": "Pan",
+            "skillet": "Skillet",
+            "wok": "Wok",
+            "griddle": "Griddle",
+            "grill pan": "Grill Pan",
+            "grill plate": "Grill Plate",
+            "grill rack": "Grill Rack",
+            "grill tray": "Grill Tray",
+            "grill basket": "Grill Basket",
+        }
+
+        session_attr = handler_input.attributes_manager.persistent_attributes
+        if session_attr["state"] == "cooking":
+            step = session_attr['steps'][session_attr['step']]['text']
+            step = step.lower()
+            step = step.split()
+            speak_output = []
+            for word in step:
+                if word in utensil_lexicon:
+                    speak_output.append(
+                        f'{word}-{utensil_lexicon[word]} ')
+            speak_output = " ".join(speak_output)
 
         return (
             handler_input.response_builder
@@ -259,7 +396,32 @@ class TimeIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "It takes 10 minutes to cook."
+        session_attr = handler_input.attributes_manager.persistent_attributes
+        if session_attr["state"] == "cooking":
+            step = session_attr['steps'][session_attr['step']]['text']
+            step = step.lower()
+            step = step.split()
+            speak_output = []
+            # find time in step
+            for word in step:
+                if word in ["minutes", "minute", "mins", "min"]:
+                    # find the number of mins before the minutes, if any
+                    index = step.index(word)
+                    if index > 0:
+                        if step[index-1].isdigit():
+                            speak_output.append(
+                                f'{step[index-1]} minutes ')
+                if word in ["hours", "hour", "hrs", "hr"]:
+                    # find the number of mins before the minutes, if any
+                    index = step.index(word)
+                    if index > 0:
+                        if step[index-1].isdigit():
+                            speak_output.append(
+                                f'{step[index-1]} hours ')
+
+            speak_output = " ".join(speak_output)
+            if speak_output == "":
+                speak_output = "No time found in this step."
 
         return (
             handler_input.response_builder
@@ -278,7 +440,38 @@ class TempreatureIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "It needs 100 degree celsius to cook."
+        session_attr = handler_input.attributes_manager.persistent_attributes
+        if session_attr["state"] == "cooking":
+            step = session_attr['steps'][session_attr['step']]['text']
+            step = step.lower()
+            step = step.split()
+            speak_output = []
+            # find time in step
+            for word in step:
+                if word in ["degrees", "degree", "deg", "celsius", "celcius", "c"]:
+                    # find the number of mins before the minutes, if any
+                    index = step.index(word)
+                    if index > 0:
+                        if step[index-1].isdigit():
+                            speak_output.append(
+                                f'{step[index-1]} degrees celsius ')
+                if word in ['fahrenheit', 'f']:
+                    # find the number of mins before the minutes, if any
+                    index = step.index(word)
+                    if index > 0:
+                        if step[index-1].isdigit():
+                            speak_output.append(
+                                f'{step[index-1]} degrees fahrenheit ')
+                if word in ['hot', 'warm', 'cold', 'cool', 'room temperature', 'very hot', 'very cold']:
+                    speak_output.append(
+                        f'{word} ')
+                if word in ['low', 'medium', 'high']:
+                    speak_output.append(
+                        f'{word} heat ')
+
+            speak_output = " ".join(speak_output)
+            if speak_output == "":
+                speak_output = "No temperature found in this step."
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -296,8 +489,25 @@ class CookingSuggestionIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You can add more chicken to the wok."
+        session_attr = handler_input.attributes_manager.persistent_attributes
+        if session_attr["state"] == "cooking":
+            step = session_attr['steps'][session_attr['step']]['text']
+            step = step.lower()
+            step = step.split()
+            speak_output = []
+            # find time in step
+            for word in step:
+                if word in ["suggestion", "suggestions", "tip", "tips"]:
+                    # find the number of mins before the minutes, if any
+                    index = step.index(word)
+                    if index > 0:
+                        if step[index-1].isdigit():
+                            speak_output.append(
+                                f'{step[index-1]} suggestions ')
 
+            speak_output = " ".join(speak_output)
+            if speak_output == "":
+                speak_output = "No suggestions found in this step."
         return (
             handler_input.response_builder
             .speak(speak_output)
