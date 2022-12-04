@@ -172,13 +172,13 @@ class PreviousIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr["state"] == "cooking":
-            session_attr["step"] = int(session_attr["step"]) - 1
-            if session_attr["step"] == 0:
-                speak_output = f"You are at the first step. Would you like to hear the next step?"
-            else:
+            if session_attr["step"] > 0:
+                session_attr["step"] = int(session_attr["step"]) - 1
                 speak_output = f"The previous step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
-                handler_input.attributes_manager.persistent_attributes = session_attr
-                handler_input.attributes_manager.save_persistent_attributes()
+            else session_attr["step"] == 0:
+                speak_output = f"You are at the first step. The step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
+            handler_input.attributes_manager.persistent_attributes = session_attr
+            handler_input.attributes_manager.save_persistent_attributes()
         else:
             speak_output = f"Please select a recipe first."
 
