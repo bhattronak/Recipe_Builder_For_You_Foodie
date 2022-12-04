@@ -33,7 +33,6 @@ def recipe_parser(url):
     """Return a recipe for the given URL"""
     import requests
     from bs4 import BeautifulSoup
-    from googlesearch import search
 
     jdict = {}
 
@@ -132,24 +131,6 @@ def recipe_parser(url):
     jdict['steps'] = jlist
     # jdict
     # now add this to final code
-
-    for i in steps:
-        for j in i:
-            print(j)
-            print(" ")
-    print("You can refer same recipe via youtube based on video link below,which is best recommendation of YouTube:")
-
-    queryforyoutube = "youtube"+"Paneer Tikka"
-    youtubesites = []
-    for j in search(queryforyoutube, tld="co.in", num=10, stop=10, pause=2):
-        youtubesites.append(j)
-    topyoutubesite = []
-    for web in youtubesites:
-        if 'youtube' in str(web):
-            topyoutubesite.append(web)
-    print(topyoutubesite[0])
-    jdict['TopYouTubelink'] = topyoutubesite[0]
-    print(json.dumps(jdict))
     return jdict
 
 
