@@ -5,7 +5,7 @@
 # session persistence, api calls, and more.
 # This sample is built using the handler classes approach in skill builder.
 import logging
-import ask_sdk_core.utils as ask_utils
+import ask_sdk_core.utils as ask_utils 
 
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
@@ -13,6 +13,8 @@ from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 
 from ask_sdk_model import Response
+
+from utils import recipe_parser
 
 import os
 import boto3
@@ -62,11 +64,17 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        available_recipe = [{'name': 'Chicken Parsem', 'id': '1', 'url': 'https://www.allrecipes.com/recipe/228830/chicken-parmesan/'},
+                            {'name': 'Chicken Soup', 'id': '2',
+                                'url': 'https://www.allrecipes.com/recipe/228830/chicken-soup/'},
+                            {'name': 'Chicken Curry', 'id': '3', 'url': 'https://www.allrecipes.com/recipe/228830/chicken-curry/'}]
+
+
         speak_output = f"Hello there! I'm a recipe bot. I'm going to help you cook a delicious meal. Would you like to start cooking?"
 
         attr = handler_input.attributes_manager.persistent_attributes
         attr['state'] = 'start'
-        attr['recipe_id'] = '1'
+        attr['available_recipe'] = available_recipe
         handler_input.attributes_manager.persistent_attributes = attr
         handler_input.attributes_manager.save_persistent_attributes()
 
@@ -78,6 +86,55 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
         )
 
 
+class AvailableRecipeIntentHandler(AbstractRequestHandler):
+    """Handler for Available Recipe Intent."""
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("AvailableRecipeIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        attr = handler_input.attributes_manager.persistent_attributes
+        available_recipe = attr['available_recipe']
+        speak_output = f"Here are the available recipes: "
+        for recipe_index in range(len(available_recipe)):
+            speak_output += f"{recipe_index + 1}. {available_recipe[recipe_index]['name']}. "
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask('add a reprompt if you want to keep the session open for the user to respond')
+            .response
+        )
+
+class SelectRecipeIntentHandler(AbstractRequestHandler):
+    """Handler for Select Recipe Intent."""
+
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("SelectRecipeIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        attr = handler_input.attributes_manager.persistent_attributes
+        available_recipe = attr['available_recipe']
+        selected_recipe = handler_input.request_envelope.request.intent.slots['recipe'].value
+        selected_recipe = int(selected_recipe) - 1
+        speak_output = f"You have selected {available_recipe[selected_recipe]['name']}. Would you like to start cooking?"
+
+        attr['state'] = 'start_cooking'
+        attr['selected_recipe'] = available_recipe[selected_recipe]
+        handler_input.attributes_manager.persistent_attributes = attr
+        handler_input.attributes_manager.save_persistent_attributes()
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            # .ask('add a reprompt if you want to keep the session open for the user to respond')
+            .response
+        )
+
 class StartCookingIntentHandler(AbstractRequestHandler):
     """Handler for Start Cooking Intent."""
 
@@ -86,15 +143,20 @@ class StartCookingIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name('StartCookingIntent')(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        data = json.loads('{"link":"https://www.allrecipes.com/recipe/240652/paneer-tikka-masala/","ingredientList":[{"qty":1,"unit":"cup","name":"plain yogurt"},{"qty":1,"unit":"tablespoon","name":"ground cumin"}],"prepTime:":{"qty":15,"unit":"minutes"},"cookTime:":{"qty":1,"unit":"hour"},"totalTime:":{"qty":50,"unit":"mins"},"servings:":6,"steps":[{"step":0,"text":"In a large bowl, mix together the yogurt and cumin. Add the paneer and toss to coat. Cover and refrigerate for at least 1 hour."},{"step":1,"text":"Preheat the oven to 400 degrees F (200 degrees C)."}],"recipeName":"Paneer Tikka Masala","topYouTubeLink":"https://www.youtube.com/watch?v=hsR0JaD1TyA"}')
         attr = handler_input.attributes_manager.persistent_attributes
-        speak_output = f'Okay! You need to select the recipe first!!!'
-        if attr['recipe_id']:
-            session_attr = {**attr, **data}
+        selected_recipe = attr['selected_recipe']
+        recipe = recipe_parser.get_recipe(selected_recipe['url'])
+        speak_output = f"Here are the ingredients: "
+        for ingredient in recipe['ingredients']:
+            speak_output += f"{ingredient}. "
+        #  Add preparation time and cooking time
+        speak_output += f"Preparation time is {recipe['preparation_time']} minutes. Cooking time is {recipe['cooking_time']} minutes. Would you like to start cooking?"
+        if attr['state'] == 'start_cooking':
+            session_attr = {**recipe}
+            session_attr['selected_recipe'] = attr['selected_recipe']
             session_attr['step'] = 0
             session_attr['state'] = 'cooking'
-            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}.  The first step is {session_attr["steps"][0]["text"]}. Would you like to hear the next step?'
+            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}. {speak_output}'
             handler_input.attributes_manager.persistent_attributes = session_attr
             handler_input.attributes_manager.save_persistent_attributes()
         return (
@@ -481,7 +543,7 @@ class TempreatureIntentHandler(AbstractRequestHandler):
                 if word in tempreature_lexicon:
                     speak_output.append(
                         f'{word} ')
-                        
+
 
             speak_output = " ".join(speak_output)
             if speak_output == "":

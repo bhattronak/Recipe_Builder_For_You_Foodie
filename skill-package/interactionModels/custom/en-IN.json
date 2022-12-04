@@ -37,31 +37,6 @@
           "samples": []
         },
         {
-          "name": "searchRecipeIntent",
-          "slots": [],
-          "samples": [
-            "what is in the list",
-            "What is in the saved list",
-            "What am I cooking today"
-          ]
-        },
-        {
-          "name": "selectRecipeIntent",
-          "slots": [
-            {
-              "name": "recipe",
-              "type": "AMAZON.Food"
-            },
-            {
-              "name": "id",
-              "type": "AMAZON.NUMBER"
-            }
-          ],
-          "samples": [
-            "Lets cook the {recipe}"
-          ]
-        },
-        {
           "name": "ContentIntent",
           "slots": [],
           "samples": [
@@ -142,49 +117,34 @@
             "Lets start cooking",
             "Start cooking"
           ]
-        }
-      ],
-      "types": []
-    },
-    "dialog": {
-      "intents": [
+        },
         {
-          "name": "selectRecipeIntent",
-          "confirmationRequired": true,
-          "prompts": {
-            "confirmation": "Confirm.Intent.302804731656"
-          },
+          "name": "AvailableRecipeIntent",
+          "slots": [],
+          "samples": [
+            "What are the available recipe",
+            "What all recipe do i have in the list"
+          ]
+        },
+        {
+          "name": "SelectRecipeIntent",
           "slots": [
             {
-              "name": "recipe",
-              "type": "AMAZON.Food",
-              "elicitationRequired": false,
-              "confirmationRequired": false,
-              "prompts": {}
+              "name": "count",
+              "type": "AMAZON.NUMBER"
             },
             {
-              "name": "id",
-              "type": "AMAZON.NUMBER",
-              "elicitationRequired": false,
-              "confirmationRequired": false,
-              "prompts": {}
+              "name": "count_string",
+              "type": "AMAZON.Ordinal"
             }
+          ],
+          "samples": [
+            "Lets cook the {count} recipe"
           ]
         }
       ],
-      "delegationStrategy": "ALWAYS"
-    },
-    "prompts": [
-      {
-        "id": "Confirm.Intent.302804731656",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Do you want to cook {recipe} "
-          }
-        ]
-      }
-    ]
+      "types": []
+    }
   },
-  "version": "2"
+  "version": "4"
 }
