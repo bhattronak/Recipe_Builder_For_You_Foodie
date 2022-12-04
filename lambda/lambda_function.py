@@ -94,7 +94,7 @@ class StartCookingIntentHandler(AbstractRequestHandler):
             session_attr = {**attr, **data}
             session_attr['step'] = 0
             session_attr['state'] = 'cooking'
-            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}.  The first step is {session_attr["steps"][0]["text"]}. Would you like to hear the next step?'  
+            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}.  The first step is {session_attr["steps"][0]["text"]}. Would you like to hear the next step?'
             handler_input.attributes_manager.persistent_attributes = session_attr
             handler_input.attributes_manager.save_persistent_attributes()
         return (
@@ -117,10 +117,12 @@ class ContentIntentHandler(AbstractRequestHandler):
         session_attr = handler_input.attributes_manager.persistent_attributes
         if session_attr['state'] == 'cooking':
             # Find the step in steps lists
-            step = session_attr["steps"].index(lambda d: d.step == session_attr["step"])
-            speak_output = f"The current step is {session_attr.steps[step].text}. Would you like to hear the next step?"
+            step = session_attr["steps"].index(
+                lambda d: d.step == session_attr["step"])
+            speak_output = f"The current step is {session_attr['steps'][step]['text']}. Would you like to hear the next step?"
         else:
             speak_output = f"Please select a recipe first."
+
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -145,9 +147,13 @@ class NextIntentHandler(AbstractRequestHandler):
                 speak_output = f"You have completed the recipe. Would you like to start another recipe?"
                 session_attr["state"] = "idle"
             else:
-                speak_output = f"The next step is {session_attr.steps[session_attr.step].text}. Would you like to hear the next step?"
+                speak_output = f"The next step is {session_attr['steps'][session_attr.step]['text']}. Would you like to hear the next step?"
         else:
             speak_output = f"Please select a recipe first."
+
+        handler_input.attributes_manager.persistent_attributes = session_attr
+        handler_input.attributes_manager.save_persistent_attributes()
+
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -171,9 +177,13 @@ class PreviousIntentHandler(AbstractRequestHandler):
             if session_attr["step"] == 0:
                 speak_output = f"You are at the first step. Would you like to hear the next step?"
             else:
-                speak_output = f"The previous step is {session_attr.steps[session_attr.step].text}. Would you like to hear the next step?"
+                speak_output = f"The previous step is {session_attr['steps'][session_attr]['step']['text']}. Would you like to hear the next step?"
         else:
             speak_output = f"Please select a recipe first."
+
+        handler_input.attributes_manager.persistent_attributes = session_attr
+        handler_input.attributes_manager.save_persistent_attributes()
+
         return (
             handler_input.response_builder
             .speak(speak_output)
