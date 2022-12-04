@@ -18,7 +18,7 @@ from utils import recipe_parser
 
 import os
 import boto3
-import json
+
 
 from ask_sdk_core.skill_builder import CustomSkillBuilder
 from ask_sdk_dynamodb.adapter import DynamoDbAdapter
@@ -45,7 +45,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Welcome, you can say Hello or Help. Which would you like to try?"
+        speak_output = "Welcome, I'm a recipe bot!! you can say Hello or Hi to know more. Which would you like to try?"
 
         return (
             handler_input.response_builder
@@ -64,13 +64,37 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        available_recipe = [{'name': 'Chicken Parsem', 'id': '1', 'url': 'https://www.allrecipes.com/recipe/228830/chicken-parmesan/'},
-                            {'name': 'Chicken Soup', 'id': '2',
-                                'url': 'https://www.allrecipes.com/recipe/228830/chicken-soup/'},
-                            {'name': 'Chicken Curry', 'id': '3', 'url': 'https://www.allrecipes.com/recipe/228830/chicken-curry/'}]
+        available_recipe = [{"name": "Paneer Tikka Masala", "url": "https://www.allrecipes.com/recipe/240652/paneer-tikka-masala/"},
+                            {"name": "Crispy Rosemary Chicken and Fries",
+                                "url": "https://www.allrecipes.com/recipe/77489/crispy-rosemary-chicken-and-fries/"},
+                            {"name": "Miso Soup",
+                                "url": "https://www.allrecipes.com/recipe/13107/miso-soup/"},
+                            {"name": "Homemade Mac and Cheese",
+                             "url": "https://www.allrecipes.com/recipe/11679/homemade-mac-and-cheese/"},
+                            {"name": "Gingerbread Snowflakes",
+                             "url": "https://www.allrecipes.com/recipe/8513071/gingerbread-snowflakes/"},
+                            {"name": "Quick Beef Stir-Fry",
+                             "url": "https://www.allrecipes.com/recipe/228823/quick-beef-stir-fry/"},
+                            {"name": "Slow Cooker Beef Stew",
+                             "url": "https://www.allrecipes.com/recipe/14685/slow-cooker-beef-stew-i/"},
+                            {"name": "Perfect Sushi Rice",
+                             "url": "https://www.allrecipes.com/recipe/99211/perfect-sushi-rice/"},
+                            {"name": "Best Steak Marinade in Existence",
+                             "url": "https://www.allrecipes.com/recipe/143809/best-steak-marinade-in-existence/"},
+                            {"name": "Spiced Pear Old-Fashioned",
+                             "url": "https://www.allrecipes.com/recipe/8491553/spiced-pear-old-fashioned/"},
+                            {"name": "Traditional Filipino Lumpia",
+                             "url": "https://www.allrecipes.com/recipe/35151/traditional-filipino-lumpia/"},
+                            {"name": "Wine-Roasted Onions",
+                             "url": "https://www.allrecipes.com/recipe/8489272/wine-roasted-onions/"},
+                            {"name": "Washington Apple Cocktail",
+                             "url": "https://www.allrecipes.com/recipe/8511288/washington-apple-cocktail/"},
+                            {"name": "Air Fryer Potato Wedges", "url": "https://www.allrecipes.com/recipe/266826/air-fryer-potato-wedges/"}]
 
 
-        speak_output = f"Hello there! I'm a recipe bot. I'm going to help you cook a delicious meal. Would you like to start cooking?"
+
+
+        speak_output = f"Hello there! I'm going to help you cook a delicious meal. Do you want to know the avaialble recipes?"
 
         attr = handler_input.attributes_manager.persistent_attributes
         attr['state'] = 'start'
@@ -100,10 +124,11 @@ class AvailableRecipeIntentHandler(AbstractRequestHandler):
         speak_output = f"Here are the available recipes: "
         for recipe_index in range(len(available_recipe)):
             speak_output += f"{recipe_index + 1}. {available_recipe[recipe_index]['name']}. "
-
+        ask_output = "Which recipe would you like to try?"
         return (
             handler_input.response_builder
             .speak(speak_output)
+            .ask(ask_output)
             # .ask('add a reprompt if you want to keep the session open for the user to respond')
             .response
         )
@@ -209,7 +234,7 @@ class NextIntentHandler(AbstractRequestHandler):
             session_attr["step"] = int(session_attr["step"]) + 1
             if session_attr["step"] == len(session_attr["steps"]):
                 speak_output = f"You have completed the recipe. Would you like to start another recipe?"
-                # session_attr["state"] = "idle"
+                session_attr["state"] = "idle"
             else:
                 speak_output = f"The next step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
                 handler_input.attributes_manager.persistent_attributes = session_attr
@@ -717,6 +742,8 @@ sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(HelloWorldIntentHandler())
+sb.add_request_handler(AvailableRecipeIntentHandler())
+sb.add_request_handler(SelectRecipeIntentHandler())
 sb.add_request_handler(StartCookingIntentHandler())
 sb.add_request_handler(ContentIntentHandler())
 sb.add_request_handler(CookingSuggestionIntentHandler())
