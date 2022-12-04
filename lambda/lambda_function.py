@@ -118,7 +118,7 @@ class ContentIntentHandler(AbstractRequestHandler):
         if session_attr['state'] == 'cooking':
             # Find the step in steps lists
             step = list(filter(lambda step: step['step'] == session_attr['step'], session_attr['steps']))
-            if len(step)>0:
+            if len(step)>0: 
                 step = step[0]['text']
             speak_output = f"The current step is {step}. Would you like to hear the next step?"
         else:
@@ -148,7 +148,7 @@ class NextIntentHandler(AbstractRequestHandler):
                 speak_output = f"You have completed the recipe. Would you like to start another recipe?"
                 session_attr["state"] = "idle"
             else:
-                speak_output = f"The next step is {session_attr['steps']int([session_attr['step']])['text']}. Would you like to hear the next step?"
+                speak_output = f"The next step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
                 handler_input.attributes_manager.persistent_attributes = session_attr
                 handler_input.attributes_manager.save_persistent_attributes()
         else:
