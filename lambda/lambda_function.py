@@ -147,7 +147,7 @@ class NextIntentHandler(AbstractRequestHandler):
                 speak_output = f"You have completed the recipe. Would you like to start another recipe?"
                 session_attr["state"] = "idle"
             else:
-                speak_output = f"The next step is {session_attr['steps'][session_attr.step]['text']}. Would you like to hear the next step?"
+                speak_output = f"The next step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
         else:
             speak_output = f"Please select a recipe first."
 
@@ -157,7 +157,6 @@ class NextIntentHandler(AbstractRequestHandler):
         return (
             handler_input.response_builder
             .speak(speak_output)
-            # .ask("add a reprompt if you want to keep the session open for the user to respond")
             .response
         )
 
@@ -177,7 +176,7 @@ class PreviousIntentHandler(AbstractRequestHandler):
             if session_attr["step"] == 0:
                 speak_output = f"You are at the first step. Would you like to hear the next step?"
             else:
-                speak_output = f"The previous step is {session_attr['steps'][session_attr]['step']['text']}. Would you like to hear the next step?"
+                speak_output = f"The previous step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
         else:
             speak_output = f"Please select a recipe first."
 
