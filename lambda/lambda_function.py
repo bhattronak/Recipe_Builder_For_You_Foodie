@@ -167,7 +167,7 @@ class SelectRecipeIntentHandler(AbstractRequestHandler):
         attr = handler_input.attributes_manager.persistent_attributes
         available_recipe = attr['available_recipe']
         selected_recipe = handler_input.request_envelope.request.intent.slots['count'].value
-        selected_recipe = int(ordinal_number_map[selected_recipe]) - 1
+        selected_recipe = int(selected_recipe) - 1
         speak_output = f"You have selected {available_recipe[selected_recipe]['name']}. Would you like to start cooking?"
 
         attr['state'] = 'start_cooking'
