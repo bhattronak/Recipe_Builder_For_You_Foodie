@@ -62,17 +62,14 @@ class HelloWorldIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You already have a recipe set up. Would you like to start cooking?"
+        speak_output = f"Hello there! I'm a recipe bot. I'm going to help you cook a delicious meal. Would you like to start cooking?"
+
         attr = handler_input.attributes_manager.persistent_attributes
-        if not attr:
-            data = json.loads('{"link":"https://www.allrecipes.com/recipe/240652/paneer-tikka-masala/","ingredientList":[{"qty":1,"unit":"cup","name":"plain yogurt"},{"qty":1,"unit":"tablespoon","name":"ground cumin"}],"prepTime:":{"qty":15,"unit":"minutes"},"cookTime:":{"qty":1,"unit":"hour"},"totalTime:":{"qty":50,"unit":"mins"},"servings:":6,"steps":[{"step":1,"text":"In a large bowl, mix together the yogurt and cumin. Add the paneer and toss to coat. Cover and refrigerate for at least 1 hour."},{"step":2,"text":"Preheat the oven to 400 degrees F (200 degrees C)."}],"recipeName":"Paneer Tikka Masala","topYouTubeLink":"https://www.youtube.com/watch?v=hsR0JaD1TyA"}')
-            data["id"] = 1
-            if "recipes" not in attr:
-                attr["recipe"] = data
-                speak_output = f"Hello there! I'm a recipe bot. I'm going to help you cook a delicious meal. I'm setting up your recipe now. Please wait. I'm done setting up your recipe {attr.recipe.recipeName}. Would you like to start cooking?"
-                handler_input.attributes_manager.persistent_attributes = attr
-                handler_input.attributes_manager.save_persistent_attributes()
-                
+        attr['state'] = 'start'
+        attr['recipe_id'] = '1'
+        handler_input.attributes_manager.persistent_attributes = attr
+        handler_input.attributes_manager.save_persistent_attributes()
+
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -90,11 +87,14 @@ class StartCookingIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You don't have a recipe set up. Would you like to set one up?"
+        data = json.loads('{"link":"https://www.allrecipes.com/recipe/240652/paneer-tikka-masala/","ingredientList":[{"qty":1,"unit":"cup","name":"plain yogurt"},{"qty":1,"unit":"tablespoon","name":"ground cumin"}],"prepTime:":{"qty":15,"unit":"minutes"},"cookTime:":{"qty":1,"unit":"hour"},"totalTime:":{"qty":50,"unit":"mins"},"servings:":6,"steps":[{"step":1,"text":"In a large bowl, mix together the yogurt and cumin. Add the paneer and toss to coat. Cover and refrigerate for at least 1 hour."},{"step":2,"text":"Preheat the oven to 400 degrees F (200 degrees C)."}],"recipeName":"Paneer Tikka Masala","topYouTubeLink":"https://www.youtube.com/watch?v=hsR0JaD1TyA"}')
         attr = handler_input.attributes_manager.persistent_attributes
-        if "recipes" in attr:
-            attr['status'] = 'STARTED'
-            speak_output = f"Great! Let's get started. The first step is {attr.recipe.steps[0].text}. Would you like to hear the next step?"
+        speak_output = f"Okay! You need to select the recipe first!!!"
+        if attr["recipe_id"]:
+            attr = {**attr, **data}
+            attr["step"] = 1
+            attr["state"] = "cooking"
+            speak_output = f"Great! Let's get started. I'm setting up your recipe now. Please wait. I'm done setting up your recipe {attr.recipeName}.  The first step is {attr.steps[0].text}. Would you like to hear the next step?"
             handler_input.attributes_manager.persistent_attributes = attr
             handler_input.attributes_manager.save_persistent_attributes()
            
@@ -116,15 +116,10 @@ class ContentIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         session_attr = handler_input.attributes_manager.session_attributes
-        if "state" in session_attr:
-            state = session_attr["state"]
-            if state == "STARTED":
-                speak_output = "I am cooking"
-            else:
-                speak_output = "I am not cooking"
+        if session_attr["state"] == "cooking":
+            speak_output = f"The current step is {session_attr.steps[session_attr.step].text}. Would you like to hear the next step?"
         else:
-            speak_output = "I am not cooking"
-
+            speak_output = f"Please select a recipe first."
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -142,8 +137,16 @@ class NextIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You are in step 2. Stir the ingredients for 2 minutes. You can say next to move to the next step."
-
+        session_attr = handler_input.attributes_manager.session_attributes
+        if session_attr["state"] == "cooking":
+            session_attr["step"] += 1
+            if session_attr["step"] == len(session_attr["steps"]):
+                speak_output = f"You have completed the recipe. Would you like to start another recipe?"
+                session_attr["state"] = "idle"
+            else:
+                speak_output = f"The next step is {session_attr.steps[session_attr.step].text}. Would you like to hear the next step?"
+        else:
+            speak_output = f"Please select a recipe first."
         return (
             handler_input.response_builder
             .speak(speak_output)
@@ -161,8 +164,15 @@ class PreviousIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "You are in step 1. Add the ingredients to the wok. You can say next to move to the next step."
-
+        session_attr = handler_input.attributes_manager.session_attributes
+        if session_attr["state"] == "cooking":
+            session_attr["step"] -= 1
+            if session_attr["step"] == 0:
+                speak_output = f"You are at the first step. Would you like to hear the next step?"
+            else:
+                speak_output = f"The previous step is {session_attr.steps[session_attr.step].text}. Would you like to hear the next step?"
+        else:
+            speak_output = f"Please select a recipe first."
         return (
             handler_input.response_builder
             .speak(speak_output)
