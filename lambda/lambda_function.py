@@ -197,7 +197,8 @@ class StartCookingIntentHandler(AbstractRequestHandler):
         recipe = recipe_parser(selected_recipe['url'])
         speak_output = f"Here are the ingredients: "
         for ingredient in recipe['ingredients']:
-            speak_output += f"{ingredient}. "
+            speak_output += f"{ingredient['qty']} {ingredient['unit']} {ingredient['ingredient']} "
+            
         #  Add preparation time and cooking time
         if 'prep_time' in recipe:
             speak_output += f"Preparation time is {recipe['prep_time']}"
