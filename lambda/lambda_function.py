@@ -146,7 +146,7 @@ class NextIntentHandler(AbstractRequestHandler):
             session_attr["step"] = int(session_attr["step"]) + 1
             if session_attr["step"] == len(session_attr["steps"]):
                 speak_output = f"You have completed the recipe. Would you like to start another recipe?"
-                session_attr["state"] = "idle"
+                # session_attr["state"] = "idle"
             else:
                 speak_output = f"The next step is {session_attr['steps'][session_attr['step']]['text']}. Would you like to hear the next step?"
                 handler_input.attributes_manager.persistent_attributes = session_attr
