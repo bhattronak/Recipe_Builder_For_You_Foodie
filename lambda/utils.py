@@ -77,7 +77,7 @@ def recipe_parser(url):
                 elif spanhtml[i][j].get("data-ingredient-unit") == 'true':
                     singledict["unit"] = spanhtml[i][j].text
                 elif spanhtml[i][j].get("data-ingredient-name") == 'true':
-                    singledict["ingredient"] = spanhtml[i][j].text
+                    singledict["name"] = spanhtml[i][j].text
     # print(singledict)
         jlist.append(singledict)
     jdict['ingredients'] = jlist
