@@ -193,6 +193,7 @@ class StartCookingIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         attr = handler_input.attributes_manager.persistent_attributes
         selected_recipe = attr['selected_recipe']
+        recipeName = attr['recipeName']
         recipe = recipe_parser(selected_recipe['url'])
         speak_output = f"Here are the ingredients: "
         for ingredient in recipe['ingredients']:
@@ -210,7 +211,7 @@ class StartCookingIntentHandler(AbstractRequestHandler):
             session_attr['selected_recipe'] = attr['selected_recipe']
             session_attr['step'] = 0
             session_attr['state'] = 'cooking'
-            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {session_attr["recipeName"]}. {speak_output}'
+            speak_output = f'Great! Let\'s get started. I\'m setting up your recipe now. Please wait. I\'m done setting up your recipe {recipeName}. {speak_output}'
             handler_input.attributes_manager.persistent_attributes = session_attr
             handler_input.attributes_manager.save_persistent_attributes()
         return (
