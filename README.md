@@ -1,6 +1,7 @@
+# Kitchen Assistant: A Recipe Scraping and Q&A Bot
 This project aims to scrape recipe data from various websites and use the extracted information to answer various questions about the recipe that a user may have, such as "What are the ingredients?" or "What is the cooking time?". The project would likely involve the use of web scraping libraries such as BeautifulSoup or Scrapy, as well as natural language processing (NLP) techniques to understand the user's question and provide an appropriate answer.
 
-# The project could include the following features:
+### The project could include the following features:
 
 1. Scraping recipe data from different websites
 2. Storing the scraped data in a database
@@ -9,7 +10,7 @@ This project aims to scrape recipe data from various websites and use the extrac
 5. Option to filter recipes based on user's dietary preferences
 6. Option to export the recipe data in a desired format
 
-# This Project can be useful for:
+#### This Project can be useful for:
 
 1. cooks and chefs who want to quickly find new recipes to try
 2. recipe bloggers who want to easily access and organize recipe data
